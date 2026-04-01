@@ -5,8 +5,13 @@ import '../../../../core/constants/app_colors.dart';
 
 class PriceInputScreen extends StatefulWidget {
   final String productName;
+  final String productId;
 
-  const PriceInputScreen({super.key, required this.productName});
+  const PriceInputScreen({
+    super.key,
+    required this.productName,
+    this.productId = 'p001',
+  });
 
   @override
   State<PriceInputScreen> createState() => _PriceInputScreenState();
@@ -29,9 +34,8 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
     final price = double.tryParse(_controller.text);
     if (price == null) return;
     context.go('/scan/analysis', extra: {
-      'productName': widget.productName.isNotEmpty
-          ? widget.productName
-          : '상품',
+      'productName': widget.productName.isNotEmpty ? widget.productName : '상품',
+      'productId': widget.productId,
       'inputPrice': price,
     });
   }

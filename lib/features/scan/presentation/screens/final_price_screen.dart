@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/services/user_id_service.dart';
+import '../bloc/price_bloc.dart';
+import '../bloc/price_event.dart';
 
 class FinalPriceScreen extends StatefulWidget {
   final String productName;
+  final String productId;
   final double finalPrice;
 
   const FinalPriceScreen({
     super.key,
     required this.productName,
     required this.finalPrice,
+    this.productId = 'p001',
   });
 
   @override
@@ -21,10 +26,12 @@ class _FinalPriceScreenState extends State<FinalPriceScreen>
   late AnimationController _controller;
   late Animation<double> _scaleAnim;
   bool _submitted = false;
+  late final PriceBloc _priceBloc;
 
   @override
   void initState() {
     super.initState();
+    _priceBloc = PriceBloc();
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -35,13 +42,21 @@ class _FinalPriceScreenState extends State<FinalPriceScreen>
 
   @override
   void dispose() {
+    _priceBloc.close();
     _controller.dispose();
     super.dispose();
   }
 
-  void _submit() {
-    // TODO: POST /prices/submit
+  Future<void> _submit() async {
     setState(() => _submitted = true);
+    final userId = await UserIdService.getOrCreate();
+    _priceBloc.add(PriceSubmitted(
+      productId: widget.productId,
+      price: widget.finalPrice,
+      unit: 'kg',
+      userId: userId,
+    ));
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('가격 정보를 공유해 주셔서 감사해요! 🙏'),

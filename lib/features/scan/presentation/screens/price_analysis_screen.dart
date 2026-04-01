@@ -1,31 +1,88 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/price_classifier.dart';
 import '../../../../core/widgets/price_badge.dart';
+import '../../data/models/region_stats.dart';
+import '../bloc/price_bloc.dart';
+import '../bloc/price_event.dart';
+import '../bloc/price_state.dart';
+import 'price_stats_screen.dart' show PriceHistogramWidget;
 
-class PriceAnalysisScreen extends StatelessWidget {
+class PriceAnalysisScreen extends StatefulWidget {
   final String productName;
+  final String productId;
   final double inputPrice;
 
   const PriceAnalysisScreen({
     super.key,
     required this.productName,
     required this.inputPrice,
+    this.productId = 'p001',
   });
 
-  // Mock 지역 통계
-  static const _avg = 38.2;
-  static const _stdDev = 9.5;
+  @override
+  State<PriceAnalysisScreen> createState() => _PriceAnalysisScreenState();
+}
+
+class _PriceAnalysisScreenState extends State<PriceAnalysisScreen> {
+  late final PriceBloc _bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc = PriceBloc()
+      ..add(PriceStatsRequested(
+        productId: widget.productId,
+        lat: 41.0108,
+        lon: 28.9683,
+      ));
+  }
+
+  @override
+  void dispose() {
+    _bloc.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final status = PriceClassifier.classify(
-      observed: inputPrice,
-      avg: _avg,
-      stdDev: _stdDev,
+    return BlocProvider.value(
+      value: _bloc,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('가격 분석 결과'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.go('/scan'),
+          ),
+        ),
+        body: BlocBuilder<PriceBloc, PriceState>(
+          builder: (context, state) {
+            if (state is PriceLoading || state is PriceInitial) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (state is PriceError) {
+              return Center(child: Text(state.message));
+            }
+            if (state is PriceLoaded) {
+              return _buildContent(context, state.stats);
+            }
+            return const SizedBox();
+          },
+        ),
+      ),
     );
-    final pct = PriceClassifier.percentDiff(inputPrice, _avg);
+  }
+
+  Widget _buildContent(BuildContext context, RegionStats stats) {
+    final status = PriceClassifier.classify(
+      observed: widget.inputPrice,
+      avg: stats.avgPrice,
+      stdDev: stats.stdDev,
+    );
+    final pct = PriceClassifier.percentDiff(widget.inputPrice, stats.avgPrice);
     final message = PriceClassifier.statusMessage(status, pct);
 
     final statusColor = switch (status) {
@@ -34,85 +91,95 @@ class PriceAnalysisScreen extends StatelessWidget {
       PriceStatus.warning => AppColors.warning,
     };
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('가격 분석 결과'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/scan'),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            // 메인 결과 카드
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(28),
-              decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: statusColor.withOpacity(0.3), width: 2),
-              ),
-              child: Column(
-                children: [
-                  PriceBadge(status: status, label: message, large: true),
-                  const SizedBox(height: 24),
-                  Text(
-                    '${inputPrice.toStringAsFixed(0)} TL',
-                    style: const TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    productName,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: AppColors.onSurfaceLight,
-                    ),
-                  ),
-                ],
-              ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          // 메인 결과 카드
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(28),
+            decoration: BoxDecoration(
+              color: statusColor.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: statusColor.withValues(alpha: 0.3), width: 2),
             ),
-
-            const SizedBox(height: 20),
-
-            // 비교 정보
-            _CompareCard(inputPrice: inputPrice, avg: _avg, stdDev: _stdDev),
-
-            const SizedBox(height: 20),
-
-            // 협상 가이드
-            if (status != PriceStatus.safe)
-              _NegotiationGuide(status: status, avg: _avg),
-
-            const SizedBox(height: 20),
-
-            // 액션 버튼
-            ElevatedButton(
-              onPressed: () => context.go('/scan/final', extra: {
-                'productName': productName,
-                'finalPrice': inputPrice,
-              }),
-              child: const Text('이 가격에 구매했어요'),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton(
-              onPressed: () => context.go('/scan/input', extra: {
-                'productName': productName,
-              }),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 52),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            child: Column(
+              children: [
+                PriceBadge(status: status, label: message, large: true),
+                const SizedBox(height: 24),
+                Text(
+                  '${widget.inputPrice.toStringAsFixed(0)} TL',
+                  style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
                 ),
-              ),
-              child: const Text('다른 가격으로 다시 분석'),
+                Text(
+                  widget.productName,
+                  style: const TextStyle(fontSize: 16, color: AppColors.onSurfaceLight),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // 히스토그램 (수직선 포함)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('가격 분포 내 위치',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                const SizedBox(height: 12),
+                PriceHistogramWidget(
+                  stats: stats,
+                  userPrice: widget.inputPrice,
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // 비교 수치
+          _CompareCard(inputPrice: widget.inputPrice, stats: stats),
+
+          const SizedBox(height: 20),
+
+          // 협상 가이드
+          if (status != PriceStatus.safe)
+            _NegotiationGuide(status: status, avg: stats.avgPrice),
+
+          const SizedBox(height: 20),
+
+          ElevatedButton(
+            onPressed: () => context.go('/scan/final', extra: {
+              'productName': widget.productName,
+              'productId': widget.productId,
+              'finalPrice': widget.inputPrice,
+            }),
+            child: const Text('이 가격에 구매했어요'),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton(
+            onPressed: () => context.go('/scan/input', extra: {
+              'productName': widget.productName,
+              'productId': widget.productId,
+            }),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 52),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('다른 가격으로 다시 분석'),
+          ),
+        ],
       ),
     );
   }
@@ -120,18 +187,13 @@ class PriceAnalysisScreen extends StatelessWidget {
 
 class _CompareCard extends StatelessWidget {
   final double inputPrice;
-  final double avg;
-  final double stdDev;
+  final RegionStats stats;
 
-  const _CompareCard({
-    required this.inputPrice,
-    required this.avg,
-    required this.stdDev,
-  });
+  const _CompareCard({required this.inputPrice, required this.stats});
 
   @override
   Widget build(BuildContext context) {
-    final diff = inputPrice - avg;
+    final diff = inputPrice - stats.avgPrice;
     final isHigher = diff > 0;
 
     return Container(
@@ -140,7 +202,7 @@ class _CompareCard extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Column(
@@ -169,7 +231,7 @@ class _CompareCard extends StatelessWidget {
                   ),
                 ],
               ),
-              _StatItem('지역 평균', avg),
+              _StatItem('지역 평균', stats.avgPrice),
             ],
           ),
         ],
@@ -220,7 +282,7 @@ class _NegotiationGuide extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Column(
@@ -235,15 +297,11 @@ class _NegotiationGuide extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            '목표 가격: $targetPrice TL 이하로 흥정해보세요',
-            style: const TextStyle(fontSize: 14),
-          ),
+          Text('목표 가격: $targetPrice TL 이하로 흥정해보세요',
+              style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 12),
-          const Text(
-            '협상 문구',
-            style: TextStyle(fontSize: 12, color: AppColors.onSurfaceLight),
-          ),
+          const Text('협상 문구',
+              style: TextStyle(fontSize: 12, color: AppColors.onSurfaceLight)),
           const SizedBox(height: 8),
           _PhraseChip('너무 비싸요', 'هذا غالي جداً'),
           const SizedBox(height: 6),
@@ -274,10 +332,7 @@ class _PhraseChip extends StatelessWidget {
           const Spacer(),
           Text(
             ar,
-            style: const TextStyle(
-              fontSize: 15,
-              fontFamily: 'NotoSansArabic',
-            ),
+            style: const TextStyle(fontSize: 15, fontFamily: 'NotoSansArabic'),
             textDirection: TextDirection.rtl,
           ),
           const SizedBox(width: 8),

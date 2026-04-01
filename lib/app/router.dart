@@ -33,7 +33,8 @@ final router = GoRouter(
                 final extra = state.extra as Map<String, dynamic>? ?? {};
                 return PriceStatsScreen(
                   productName: extra['productName'] as String? ?? '',
-                  detectedPrice: extra['detectedPrice'] as double? ?? 0,
+                  productId: extra['productId'] as String? ?? 'p001',
+                  detectedPrice: extra['detectedPrice'] as double?,
                 );
               },
             ),
@@ -43,6 +44,7 @@ final router = GoRouter(
                 final extra = state.extra as Map<String, dynamic>? ?? {};
                 return PriceInputScreen(
                   productName: extra['productName'] as String? ?? '',
+                  productId: extra['productId'] as String? ?? 'p001',
                 );
               },
             ),
@@ -52,6 +54,7 @@ final router = GoRouter(
                 final extra = state.extra as Map<String, dynamic>? ?? {};
                 return PriceAnalysisScreen(
                   productName: extra['productName'] as String? ?? '',
+                  productId: extra['productId'] as String? ?? 'p001',
                   inputPrice: extra['inputPrice'] as double? ?? 0,
                 );
               },
@@ -62,6 +65,7 @@ final router = GoRouter(
                 final extra = state.extra as Map<String, dynamic>? ?? {};
                 return FinalPriceScreen(
                   productName: extra['productName'] as String? ?? '',
+                  productId: extra['productId'] as String? ?? 'p001',
                   finalPrice: extra['finalPrice'] as double? ?? 0,
                 );
               },

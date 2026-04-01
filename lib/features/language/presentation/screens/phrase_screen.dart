@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/services/tts_service.dart';
 
 class PhraseScreen extends StatefulWidget {
   const PhraseScreen({super.key});
@@ -91,9 +92,25 @@ class _PhraseScreenState extends State<PhraseScreen> {
   }
 }
 
-class _PhraseCard extends StatelessWidget {
+class _PhraseCard extends StatefulWidget {
   final Map<String, dynamic> phrase;
   const _PhraseCard({required this.phrase});
+
+  @override
+  State<_PhraseCard> createState() => _PhraseCardState();
+}
+
+class _PhraseCardState extends State<_PhraseCard> {
+  bool _speaking = false;
+  final _tts = TtsService();
+
+  Future<void> _speak() async {
+    final text = widget.phrase['text_ar'] as String? ?? '';
+    if (text.isEmpty) return;
+    setState(() => _speaking = true);
+    await _tts.speakArabic(text);
+    if (mounted) setState(() => _speaking = false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +126,7 @@ class _PhraseCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    phrase['text_kr'] ?? '',
+                    widget.phrase['text_kr'] ?? '',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -117,14 +134,17 @@ class _PhraseCard extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.volume_up, color: AppColors.primary),
-                  onPressed: () {}, // TODO: flutter_tts
+                  icon: Icon(
+                    _speaking ? Icons.stop_circle : Icons.volume_up,
+                    color: _speaking ? AppColors.warning : AppColors.primary,
+                  ),
+                  onPressed: _speaking ? _tts.stop : _speak,
                 ),
               ],
             ),
             const SizedBox(height: 8),
             Text(
-              phrase['text_ar'] ?? '',
+              widget.phrase['text_ar'] ?? '',
               style: const TextStyle(
                 fontSize: 22,
                 fontFamily: 'NotoSansArabic',
@@ -134,7 +154,7 @@ class _PhraseCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              phrase['romanized'] ?? '',
+              widget.phrase['romanized'] ?? '',
               style: const TextStyle(
                 fontSize: 13,
                 color: AppColors.onSurfaceLight,
