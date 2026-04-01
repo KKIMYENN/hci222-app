@@ -1,6 +1,4 @@
 import 'dart:io';
-import '../../../../core/network/dio_client.dart';
-import '../../../../core/constants/api_endpoints.dart';
 import '../models/detection_result.dart';
 
 abstract class ScanRepository {

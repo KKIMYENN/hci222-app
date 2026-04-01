@@ -1,5 +1,3 @@
-import '../../../../core/constants/api_endpoints.dart';
-import '../../../../core/network/dio_client.dart';
 import '../models/region_stats.dart';
 
 abstract class PriceRepository {
@@ -20,21 +18,32 @@ abstract class PriceRepository {
 }
 
 class PriceRepositoryImpl implements PriceRepository {
+  // 단순 인메모리 캐시: 같은 productId는 앱 세션 내 1회만 API 호출
+  static final Map<String, RegionStats> _cache = {};
+
   @override
   Future<RegionStats> getStats({
     required String productId,
     required double lat,
     required double lon,
   }) async {
+    if (_cache.containsKey(productId)) {
+      return _cache[productId]!;
+    }
+
     // TODO: 백엔드 연동 시 아래 주석 해제
     // final res = await DioClient.instance.get(
     //   ApiEndpoints.priceStats,
     //   queryParameters: {'product_id': productId, 'lat': lat, 'lon': lon},
     // );
-    // return RegionStats.fromJson(res.data);
+    // final stats = RegionStats.fromJson(res.data);
+    // _cache[productId] = stats;
+    // return stats;
 
     await Future.delayed(const Duration(milliseconds: 500));
-    return RegionStats.mock(productId);
+    final stats = RegionStats.mock(productId);
+    _cache[productId] = stats;
+    return stats;
   }
 
   @override
@@ -56,6 +65,11 @@ class PriceRepositoryImpl implements PriceRepository {
     //   'user_id': userId,
     // });
 
+    // 가격 제출 후 해당 상품 캐시 무효화 (다음 조회 시 최신 데이터 반영)
+    _cache.remove(productId);
     await Future.delayed(const Duration(milliseconds: 300));
   }
+
+  /// 테스트용 캐시 초기화
+  static void clearCache() => _cache.clear();
 }

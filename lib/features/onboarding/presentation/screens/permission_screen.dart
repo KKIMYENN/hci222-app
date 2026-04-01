@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -50,16 +51,18 @@ class PermissionScreen extends StatelessWidget {
               const Spacer(),
               ElevatedButton(
                 onPressed: () => context.go('/intro'),
-                child: const Text('권한 허용하고 시작하기'),
+                child: Text(kIsWeb ? '시작하기' : '권한 허용하고 시작하기'),
               ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () => context.go('/intro'),
-                child: const Text(
-                  '나중에 설정하기',
-                  style: TextStyle(color: AppColors.onSurfaceLight),
+              if (!kIsWeb) ...[
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: () => context.go('/intro'),
+                  child: const Text(
+                    '나중에 설정하기',
+                    style: TextStyle(color: AppColors.onSurfaceLight),
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
         ),

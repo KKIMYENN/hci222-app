@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/price_classifier.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/price_badge.dart';
 
 class CommunityScreen extends StatelessWidget {
@@ -51,10 +52,9 @@ class _FeedCard extends StatelessWidget {
     );
     final pct = PriceClassifier.percentDiff(feed.price, feed.avgPrice);
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: AppCard(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

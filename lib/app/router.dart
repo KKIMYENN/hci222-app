@@ -13,6 +13,18 @@ import '../features/market_map/presentation/screens/market_map_screen.dart';
 import '../features/language/presentation/screens/phrase_screen.dart';
 import '../features/community/presentation/screens/community_screen.dart';
 
+// extra Map에서 타입 안전하게 값을 꺼내는 헬퍼
+extension _ExtraX on Map<String, dynamic> {
+  String str(String key, [String fallback = '']) =>
+      this[key] as String? ?? fallback;
+  double dbl(String key, [double fallback = 0.0]) =>
+      (this[key] as num?)?.toDouble() ?? fallback;
+  double? dblOrNull(String key) => (this[key] as num?)?.toDouble();
+}
+
+Map<String, dynamic> _extra(GoRouterState s) =>
+    s.extra as Map<String, dynamic>? ?? {};
+
 final router = GoRouter(
   initialLocation: '/',
   routes: [
@@ -29,44 +41,44 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: 'stats',
-              builder: (_, state) {
-                final extra = state.extra as Map<String, dynamic>? ?? {};
+              builder: (_, s) {
+                final e = _extra(s);
                 return PriceStatsScreen(
-                  productName: extra['productName'] as String? ?? '',
-                  productId: extra['productId'] as String? ?? 'p001',
-                  detectedPrice: extra['detectedPrice'] as double?,
+                  productName: e.str('productName'),
+                  productId: e.str('productId', 'p001'),
+                  detectedPrice: e.dblOrNull('detectedPrice'),
                 );
               },
             ),
             GoRoute(
               path: 'input',
-              builder: (_, state) {
-                final extra = state.extra as Map<String, dynamic>? ?? {};
+              builder: (_, s) {
+                final e = _extra(s);
                 return PriceInputScreen(
-                  productName: extra['productName'] as String? ?? '',
-                  productId: extra['productId'] as String? ?? 'p001',
+                  productName: e.str('productName'),
+                  productId: e.str('productId', 'p001'),
                 );
               },
             ),
             GoRoute(
               path: 'analysis',
-              builder: (_, state) {
-                final extra = state.extra as Map<String, dynamic>? ?? {};
+              builder: (_, s) {
+                final e = _extra(s);
                 return PriceAnalysisScreen(
-                  productName: extra['productName'] as String? ?? '',
-                  productId: extra['productId'] as String? ?? 'p001',
-                  inputPrice: extra['inputPrice'] as double? ?? 0,
+                  productName: e.str('productName'),
+                  productId: e.str('productId', 'p001'),
+                  inputPrice: e.dbl('inputPrice'),
                 );
               },
             ),
             GoRoute(
               path: 'final',
-              builder: (_, state) {
-                final extra = state.extra as Map<String, dynamic>? ?? {};
+              builder: (_, s) {
+                final e = _extra(s);
                 return FinalPriceScreen(
-                  productName: extra['productName'] as String? ?? '',
-                  productId: extra['productId'] as String? ?? 'p001',
-                  finalPrice: extra['finalPrice'] as double? ?? 0,
+                  productName: e.str('productName'),
+                  productId: e.str('productId', 'p001'),
+                  finalPrice: e.dbl('finalPrice'),
                 );
               },
             ),
@@ -96,7 +108,8 @@ class _MainShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: child,
-      bottomNavigationBar: AppBottomNavBar(currentIndex: _currentIndex(context)),
+      bottomNavigationBar:
+          AppBottomNavBar(currentIndex: _currentIndex(context)),
     );
   }
 }

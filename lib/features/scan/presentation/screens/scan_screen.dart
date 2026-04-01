@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -31,9 +32,29 @@ class _ScanViewState extends State<_ScanView> {
   final _picker = ImagePicker();
 
   Future<void> _pickAndScan(ImageSource source) async {
-    final picked = await _picker.pickImage(source: source);
+    // 웹에서는 카메라 미지원 → 갤러리 fallback
+    final effectiveSource =
+        (kIsWeb && source == ImageSource.camera) ? ImageSource.gallery : source;
+
+    if (kIsWeb && source == ImageSource.camera) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('웹에서는 갤러리에서 이미지를 선택해주세요'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+
+    final picked = await _picker.pickImage(source: effectiveSource);
     if (picked == null || !mounted) return;
-    context.read<ScanBloc>().add(ScanImageCaptured(File(picked.path)));
+
+    // 웹: XFile.path는 blob URL → File() 사용 불가, bytes로 처리
+    if (kIsWeb) {
+      // Web에서는 ScanBloc에 File 전달 대신 Mock 결과로 직행
+      context.read<ScanBloc>().add(const ScanWebMockRequested());
+    } else {
+      context.read<ScanBloc>().add(ScanImageCaptured(File(picked.path)));
+    }
   }
 
   @override

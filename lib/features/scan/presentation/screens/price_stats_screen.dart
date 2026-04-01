@@ -3,12 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../../data/models/region_stats.dart';
 import '../bloc/price_bloc.dart';
 import '../bloc/price_event.dart';
 import '../bloc/price_state.dart';
 
-class PriceStatsScreen extends StatefulWidget {
+class PriceStatsScreen extends StatelessWidget {
   final String productName;
   final String productId;
   final double? detectedPrice;
@@ -21,80 +22,68 @@ class PriceStatsScreen extends StatefulWidget {
   });
 
   @override
-  State<PriceStatsScreen> createState() => _PriceStatsScreenState();
+  Widget build(BuildContext context) {
+    final displayName = productName.isNotEmpty ? productName : '인식된 상품';
+    return BlocProvider(
+      create: (_) => PriceBloc()
+        ..add(PriceStatsRequested(
+          productId: productId,
+          lat: 0, // LocationService가 내부에서 실제 좌표 획득
+          lon: 0,
+        )),
+      child: _PriceStatsView(
+        displayName: displayName,
+        productId: productId,
+        detectedPrice: detectedPrice,
+      ),
+    );
+  }
 }
 
-class _PriceStatsScreenState extends State<PriceStatsScreen> {
-  late final PriceBloc _bloc;
+class _PriceStatsView extends StatelessWidget {
+  final String displayName;
+  final String productId;
+  final double? detectedPrice;
 
-  @override
-  void initState() {
-    super.initState();
-    _bloc = PriceBloc()
-      ..add(PriceStatsRequested(
-        productId: widget.productId,
-        lat: 41.0108,
-        lon: 28.9683,
-      ));
-  }
-
-  @override
-  void dispose() {
-    _bloc.close();
-    super.dispose();
-  }
+  const _PriceStatsView({
+    required this.displayName,
+    required this.productId,
+    this.detectedPrice,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final displayName = widget.productName.isNotEmpty ? widget.productName : '인식된 상품';
-
-    return BlocProvider.value(
-      value: _bloc,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(displayName),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => context.go('/scan'),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(displayName),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/scan'),
         ),
-        body: BlocBuilder<PriceBloc, PriceState>(
-          builder: (context, state) {
-            if (state is PriceLoading || state is PriceInitial) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (state is PriceError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error_outline, size: 48, color: AppColors.warning),
-                    const SizedBox(height: 12),
-                    Text(state.message, textAlign: TextAlign.center),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () => _bloc.add(PriceStatsRequested(
-                        productId: widget.productId,
-                        lat: 41.0108,
-                        lon: 28.9683,
-                      )),
-                      child: const Text('다시 시도'),
-                    ),
-                  ],
-                ),
-              );
-            }
-            if (state is PriceLoaded) {
-              return _buildContent(context, state.stats, displayName);
-            }
-            return const SizedBox();
-          },
-        ),
+      ),
+      body: BlocBuilder<PriceBloc, PriceState>(
+        builder: (context, state) {
+          if (state is PriceLoading || state is PriceInitial) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (state is PriceError) {
+            return AppErrorWidget(
+              message: state.message,
+              onRetry: () => context.read<PriceBloc>().add(
+                    PriceStatsRequested(productId: productId, lat: 0, lon: 0),
+                  ),
+            );
+          }
+          if (state is PriceLoaded) {
+            return _buildContent(context, state.stats);
+          }
+          return const SizedBox();
+        },
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context, RegionStats stats, String displayName) {
+  Widget _buildContent(BuildContext context, RegionStats stats) {
     final totalCount = stats.distribution.fold(0, (s, b) => s + b.count);
 
     return SingleChildScrollView(
@@ -102,19 +91,7 @@ class _PriceStatsScreenState extends State<PriceStatsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 통계 요약 카드
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.06),
-                  blurRadius: 10,
-                ),
-              ],
-            ),
+          AppCard(
             child: Column(
               children: [
                 _StatsRow('평균가', stats.avgPrice, isPrimary: true),
@@ -132,39 +109,31 @@ class _PriceStatsScreenState extends State<PriceStatsScreen> {
 
           const SizedBox(height: 24),
 
-          // 히스토그램
-          const Text(
-            '가격 분포',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
+          const Text('가격 분포',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
-          Text(
-            '이 지역에서 수집된 $totalCount개 데이터',
-            style: const TextStyle(fontSize: 12, color: AppColors.onSurfaceLight),
-          ),
-          const SizedBox(height: 12),
-
-          // 범례
+          Text('이 지역에서 수집된 $totalCount개 데이터',
+              style:
+                  const TextStyle(fontSize: 12, color: AppColors.onSurfaceLight)),
+          const SizedBox(height: 8),
           Row(
             children: [
               _LegendItem(color: AppColors.primary, label: '평균가 구간'),
               const SizedBox(width: 16),
-              if (widget.detectedPrice != null)
-                _LegendItem(color: AppColors.warning, label: '인식된 가격', isDash: true),
+              if (detectedPrice != null)
+                _LegendItem(
+                    color: AppColors.warning, label: '인식된 가격', isDash: true),
             ],
           ),
           const SizedBox(height: 8),
 
-          PriceHistogramWidget(
-            stats: stats,
-            userPrice: widget.detectedPrice,
-          ),
+          PriceHistogramWidget(stats: stats, userPrice: detectedPrice),
 
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () => context.go('/scan/input', extra: {
               'productName': displayName,
-              'productId': widget.productId,
+              'productId': productId,
             }),
             child: const Text('상인이 제시한 가격 입력하기'),
           ),
@@ -185,7 +154,9 @@ class _StatsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: AppColors.onSurfaceLight)),
+        Text(label,
+            style:
+                const TextStyle(fontSize: 12, color: AppColors.onSurfaceLight)),
         const SizedBox(height: 4),
         Text(
           '${value.toStringAsFixed(0)} TL',
@@ -205,7 +176,8 @@ class _LegendItem extends StatelessWidget {
   final String label;
   final bool isDash;
 
-  const _LegendItem({required this.color, required this.label, this.isDash = false});
+  const _LegendItem(
+      {required this.color, required this.label, this.isDash = false});
 
   @override
   Widget build(BuildContext context) {
@@ -214,14 +186,13 @@ class _LegendItem extends StatelessWidget {
       children: [
         isDash
             ? Container(
-                width: 16,
-                height: 2,
-                color: color,
-                margin: const EdgeInsets.symmetric(vertical: 5),
-              )
+                width: 16, height: 2, color: color,
+                margin: const EdgeInsets.symmetric(vertical: 5))
             : Container(width: 12, height: 12, color: color),
         const SizedBox(width: 4),
-        Text(label, style: const TextStyle(fontSize: 11, color: AppColors.onSurfaceLight)),
+        Text(label,
+            style: const TextStyle(
+                fontSize: 11, color: AppColors.onSurfaceLight)),
       ],
     );
   }
@@ -230,7 +201,7 @@ class _LegendItem extends StatelessWidget {
 /// 재사용 가능한 히스토그램 위젯 (수직선 오버레이 포함)
 class PriceHistogramWidget extends StatelessWidget {
   final RegionStats stats;
-  final double? userPrice; // null이면 수직선 없음
+  final double? userPrice;
 
   const PriceHistogramWidget({
     super.key,
@@ -238,25 +209,26 @@ class PriceHistogramWidget extends StatelessWidget {
     this.userPrice,
   });
 
+  int? _findUserBucketIndex() {
+    if (userPrice == null) return null;
+    final buckets = stats.distribution;
+    for (int i = 0; i < buckets.length; i++) {
+      if (userPrice! >= buckets[i].start && userPrice! < buckets[i].end) {
+        return i;
+      }
+    }
+    return buckets.isNotEmpty ? buckets.length - 1 : null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final buckets = stats.distribution;
-    if (buckets.isEmpty) return const SizedBox(height: 160);
+    if (buckets.isEmpty) return const SizedBox(height: 180);
 
-    final maxCount = buckets.map((b) => b.count).reduce((a, b) => a > b ? a : b);
+    final maxCount =
+        buckets.map((b) => b.count).reduce((a, b) => a > b ? a : b);
     final maxY = maxCount.toDouble() * 1.3;
-
-    // 사용자 가격이 속하는 버킷 인덱스 계산
-    int? userBucketIndex;
-    if (userPrice != null) {
-      for (int i = 0; i < buckets.length; i++) {
-        if (userPrice! >= buckets[i].start && userPrice! < buckets[i].end) {
-          userBucketIndex = i;
-          break;
-        }
-      }
-      userBucketIndex ??= buckets.length - 1;
-    }
+    final userBucketIndex = _findUserBucketIndex();
 
     return SizedBox(
       height: 180,
@@ -267,7 +239,8 @@ class PriceHistogramWidget extends StatelessWidget {
           barGroups: buckets.asMap().entries.map((e) {
             final i = e.key;
             final b = e.value;
-            final isAvgBucket = stats.avgPrice >= b.start && stats.avgPrice < b.end;
+            final isAvgBucket =
+                stats.avgPrice >= b.start && stats.avgPrice < b.end;
             final isUserBucket = i == userBucketIndex;
 
             return BarChartGroupData(
@@ -281,7 +254,8 @@ class PriceHistogramWidget extends StatelessWidget {
                           ? AppColors.primary
                           : AppColors.primary.withValues(alpha: 0.35),
                   width: 22,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(4)),
                   backDrawRodData: BackgroundBarChartRodData(
                     show: isUserBucket,
                     toY: maxY,
@@ -295,7 +269,7 @@ class PriceHistogramWidget extends StatelessWidget {
               ? ExtraLinesData(
                   verticalLines: [
                     VerticalLine(
-                      x: userBucketIndex!.toDouble(),
+                      x: userBucketIndex.toDouble(),
                       color: AppColors.warning,
                       strokeWidth: 2,
                       dashArray: [4, 3],
@@ -315,9 +289,12 @@ class PriceHistogramWidget extends StatelessWidget {
                 )
               : null,
           titlesData: FlTitlesData(
-            leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
@@ -329,7 +306,8 @@ class PriceHistogramWidget extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
                       buckets[i].start.toInt().toString(),
-                      style: const TextStyle(fontSize: 9, color: AppColors.onSurfaceLight),
+                      style: const TextStyle(
+                          fontSize: 9, color: AppColors.onSurfaceLight),
                     ),
                   );
                 },
