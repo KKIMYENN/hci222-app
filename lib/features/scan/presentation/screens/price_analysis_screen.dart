@@ -114,7 +114,7 @@ class _PriceAnalysisView extends StatelessWidget {
                 PriceBadge(status: status, label: message, large: true),
                 const SizedBox(height: 24),
                 Text(
-                  '${inputPrice.toStringAsFixed(0)} TL',
+                  '${inputPrice.toStringAsFixed(0)} EGP',
                   style: const TextStyle(
                       fontSize: 48, fontWeight: FontWeight.bold),
                 ),
@@ -215,7 +215,7 @@ class _CompareContent extends StatelessWidget {
                   size: 28,
                 ),
                 Text(
-                  '${diff.abs().toStringAsFixed(0)} TL',
+                  '${diff.abs().toStringAsFixed(0)} EGP',
                   style: TextStyle(
                     color: isHigher ? AppColors.warning : AppColors.safe,
                     fontWeight: FontWeight.bold,
@@ -247,7 +247,7 @@ class _StatItem extends StatelessWidget {
                 const TextStyle(fontSize: 12, color: AppColors.onSurfaceLight)),
         const SizedBox(height: 4),
         Text(
-          '${value.toStringAsFixed(0)} TL',
+          '${value.toStringAsFixed(0)} EGP',
           style: TextStyle(
             fontSize: bold ? 20 : 18,
             fontWeight: bold ? FontWeight.bold : FontWeight.w600,
@@ -281,7 +281,7 @@ class _NegotiationContent extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        Text('목표 가격: $targetPrice TL 이하로 흥정해보세요',
+        Text('목표 가격: $targetPrice EGP 이하로 흥정해보세요',
             style: const TextStyle(fontSize: 14)),
         const SizedBox(height: 12),
         const Text('협상 문구',

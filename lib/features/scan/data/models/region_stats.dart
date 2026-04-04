@@ -47,23 +47,25 @@ class RegionStats {
             .toList(),
       );
 
-  // Mock 데이터 (사과, 이스탄불 기준)
+  // Mock 데이터 (포도 1kg, 카이로 칸 엘-칼릴리 기준, 단위: EGP)
+  // 제안서 개발 가이드 기준: 포도 40~80 EGP, 평균 55 EGP
+  // TODO: 백엔드 연동 시 RegionStats.fromJson()으로 교체
   static RegionStats mock(String productId) => RegionStats(
         productId: productId,
-        avgPrice: 38.2,
-        modePrice: 35.0,
-        maxPrice: 65.0,
-        minPrice: 20.0,
-        stdDev: 9.5,
+        avgPrice: 55.0,
+        modePrice: 50.0,
+        maxPrice: 80.0,
+        minPrice: 40.0,
+        stdDev: 10.0,
         distribution: const [
-          PriceBucket(start: 20, end: 25, count: 3),
-          PriceBucket(start: 25, end: 30, count: 8),
-          PriceBucket(start: 30, end: 35, count: 15),
-          PriceBucket(start: 35, end: 40, count: 22),
-          PriceBucket(start: 40, end: 45, count: 18),
+          PriceBucket(start: 40, end: 45, count: 4),
           PriceBucket(start: 45, end: 50, count: 10),
-          PriceBucket(start: 50, end: 55, count: 5),
-          PriceBucket(start: 55, end: 65, count: 2),
+          PriceBucket(start: 50, end: 55, count: 20),
+          PriceBucket(start: 55, end: 60, count: 24),
+          PriceBucket(start: 60, end: 65, count: 16),
+          PriceBucket(start: 65, end: 70, count: 8),
+          PriceBucket(start: 70, end: 75, count: 4),
+          PriceBucket(start: 75, end: 80, count: 2),
         ],
       );
 }

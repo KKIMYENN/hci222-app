@@ -112,7 +112,7 @@ class _PriceStatsView extends StatelessWidget {
           const Text('가격 분포',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
-          Text('이 지역에서 수집된 $totalCount개 데이터',
+          Text('샘플 데이터 $totalCount건 (데모 — 실제 지역 수집 데이터 아님)',
               style:
                   const TextStyle(fontSize: 12, color: AppColors.onSurfaceLight)),
           const SizedBox(height: 8),
@@ -159,7 +159,7 @@ class _StatsRow extends StatelessWidget {
                 const TextStyle(fontSize: 12, color: AppColors.onSurfaceLight)),
         const SizedBox(height: 4),
         Text(
-          '${value.toStringAsFixed(0)} TL',
+          '${value.toStringAsFixed(0)} EGP',
           style: TextStyle(
             fontSize: isPrimary ? 24 : 16,
             fontWeight: isPrimary ? FontWeight.bold : FontWeight.w600,
@@ -282,7 +282,7 @@ class PriceHistogramWidget extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                         labelResolver: (_) =>
-                            '${userPrice!.toStringAsFixed(0)} TL',
+                            '${userPrice!.toStringAsFixed(0)} EGP',
                       ),
                     ),
                   ],

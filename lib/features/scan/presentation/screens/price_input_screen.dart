@@ -20,7 +20,13 @@ class PriceInputScreen extends StatefulWidget {
 class _PriceInputScreenState extends State<PriceInputScreen> {
   final _controller = TextEditingController();
   String _selectedUnit = 'kg';
-  bool get _hasInput => _controller.text.isNotEmpty;
+  bool _useSlider = false;
+  // 슬라이더 범위: EGP 기준 (이집트 카이로 전통시장)
+  static const double _sliderMin = 0;
+  static const double _sliderMax = 200;
+  double _sliderValue = 50;
+
+  bool get _hasInput => _useSlider ? true : _controller.text.isNotEmpty;
 
   static const _units = ['kg', '개', '묶음', '1/2kg'];
 
@@ -31,7 +37,9 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
   }
 
   void _analyze() {
-    final price = double.tryParse(_controller.text);
+    final price = _useSlider
+        ? _sliderValue
+        : double.tryParse(_controller.text);
     if (price == null) return;
     context.go('/scan/analysis', extra: {
       'productName': widget.productName.isNotEmpty ? widget.productName : '상품',
@@ -42,6 +50,10 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final displayPrice = _useSlider
+        ? _sliderValue.toStringAsFixed(0)
+        : (_controller.text.isNotEmpty ? _controller.text : '0');
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('가격 입력'),
@@ -49,6 +61,24 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/scan'),
         ),
+        actions: [
+          // 입력 방식 토글 (키보드 ↔ 슬라이더)
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: TextButton.icon(
+              onPressed: () => setState(() => _useSlider = !_useSlider),
+              icon: Icon(
+                _useSlider ? Icons.keyboard : Icons.tune,
+                size: 18,
+                color: AppColors.primary,
+              ),
+              label: Text(
+                _useSlider ? '직접 입력' : '슬라이더',
+                style: const TextStyle(color: AppColors.primary, fontSize: 13),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),
@@ -71,7 +101,7 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
             ),
             const SizedBox(height: 32),
 
-            // 가격 입력
+            // 가격 표시 (두 모드 공통)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: BoxDecoration(
@@ -85,29 +115,41 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
               child: Row(
                 children: [
                   Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                      ],
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: '0',
-                        hintStyle: TextStyle(
-                          color: AppColors.onSurfaceLight,
-                          fontSize: 32,
-                        ),
-                      ),
-                      onChanged: (_) => setState(() {}),
-                    ),
+                    child: _useSlider
+                        // 슬라이더 모드: 읽기 전용 텍스트
+                        ? Text(
+                            displayPrice,
+                            style: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        // 키보드 모드: 텍스트 필드
+                        : TextField(
+                            controller: _controller,
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9.]')),
+                            ],
+                            style: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: '0',
+                              hintStyle: TextStyle(
+                                color: AppColors.onSurfaceLight,
+                                fontSize: 32,
+                              ),
+                            ),
+                            onChanged: (_) => setState(() {}),
+                          ),
                   ),
                   const Text(
-                    'TL',
+                    'EGP',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w500,
@@ -117,6 +159,36 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
                 ],
               ),
             ),
+
+            // 슬라이더 (슬라이더 모드일 때만 표시)
+            if (_useSlider) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Text(
+                    _sliderMin.toInt().toString(),
+                    style: const TextStyle(
+                        fontSize: 11, color: AppColors.onSurfaceLight),
+                  ),
+                  Expanded(
+                    child: Slider(
+                      value: _sliderValue,
+                      min: _sliderMin,
+                      max: _sliderMax,
+                      divisions: 200,
+                      activeColor: AppColors.primary,
+                      label: '${_sliderValue.toStringAsFixed(0)} EGP',
+                      onChanged: (v) => setState(() => _sliderValue = v),
+                    ),
+                  ),
+                  Text(
+                    _sliderMax.toInt().toString(),
+                    style: const TextStyle(
+                        fontSize: 11, color: AppColors.onSurfaceLight),
+                  ),
+                ],
+              ),
+            ],
 
             const SizedBox(height: 16),
 

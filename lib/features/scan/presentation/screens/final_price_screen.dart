@@ -143,7 +143,7 @@ class _FinalPriceViewState extends State<_FinalPriceView>
               ),
               const SizedBox(height: 8),
               Text(
-                '${widget.finalPrice.toStringAsFixed(0)} TL',
+                '${widget.finalPrice.toStringAsFixed(0)} EGP',
                 style: const TextStyle(
                     fontSize: 42, fontWeight: FontWeight.bold),
               ),

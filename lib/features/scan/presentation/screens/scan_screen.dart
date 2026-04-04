@@ -91,7 +91,8 @@ class _ScanViewState extends State<_ScanView> {
             body: Stack(
               fit: StackFit.expand,
               children: [
-                // 카메라 뷰파인더 (Mock)
+                // 카메라 뷰파인더 (데모 모드 — 실제 카메라 미연동)
+                // TODO: camera 패키지의 CameraPreview 위젯으로 교체 예정
                 Container(
                   color: Colors.black87,
                   child: Center(
@@ -109,6 +110,20 @@ class _ScanViewState extends State<_ScanView> {
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.5),
                             fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withValues(alpha: 0.8),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            '데모 모드 — 갤러리 이미지 선택 후 샘플 결과 반환',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 11),
                           ),
                         ),
                       ],
@@ -176,7 +191,7 @@ class _ScanViewState extends State<_ScanView> {
                           CircularProgressIndicator(color: AppColors.scanLine),
                           SizedBox(height: 16),
                           Text(
-                            'AI가 상품을 분석 중이에요...',
+                            '[데모] 샘플 가격 데이터를 불러오는 중...',
                             style: TextStyle(color: Colors.white, fontSize: 14),
                           ),
                         ],

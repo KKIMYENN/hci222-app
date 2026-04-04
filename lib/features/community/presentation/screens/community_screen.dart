@@ -7,12 +7,14 @@ import '../../../../core/widgets/price_badge.dart';
 class CommunityScreen extends StatelessWidget {
   const CommunityScreen({super.key});
 
+  // Mock 피드 데이터 (카이로 이집트, 단위: EGP)
+  // 가격 참고: 포도 40-80 EGP, 토마토 5-15 EGP, 오이 5-10 EGP (제안서 개발 가이드 기준)
   static final _mockFeed = [
-    _MockFeed('사과 1kg', 45.0, 38.2, '그랜드 바자르 3구역', '2분 전'),
-    _MockFeed('토마토 1kg', 28.0, 22.5, '이집션 바자르', '15분 전'),
-    _MockFeed('오이 1kg', 15.0, 18.0, '아르나부트쾨이 시장', '32분 전'),
-    _MockFeed('석류 1개', 60.0, 35.0, '그랜드 바자르 12구역', '1시간 전'),
-    _MockFeed('레몬 5개', 20.0, 22.0, '이집션 바자르', '2시간 전'),
+    _MockFeed('포도 1kg', 65.0, 55.0, '칸 엘-칼릴리 시장', '2분 전'),
+    _MockFeed('토마토 1kg', 14.0, 10.0, '알아타바 시장', '15분 전'),
+    _MockFeed('오이 1kg', 6.0, 8.0, '임바바 시장', '32분 전'),
+    _MockFeed('석류 1개', 45.0, 30.0, '칸 엘-칼릴리 시장', '1시간 전'),
+    _MockFeed('레몬 5개', 18.0, 20.0, '알아타바 시장', '2시간 전'),
   ];
 
   @override
@@ -95,7 +97,7 @@ class _FeedCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '${feed.price.toStringAsFixed(0)} TL',
+                  '${feed.price.toStringAsFixed(0)} EGP',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -104,7 +106,7 @@ class _FeedCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '(평균 ${feed.avgPrice.toStringAsFixed(0)} TL)',
+                  '(평균 ${feed.avgPrice.toStringAsFixed(0)} EGP)',
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.onSurfaceLight,

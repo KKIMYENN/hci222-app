@@ -25,12 +25,13 @@ class DetectionResult {
     );
   }
 
-  // Mock 결과
+  // Mock 결과 (포도, 카이로 기준 EGP)
+  // TODO: YOLO 백엔드 연동 시 DetectionResult.fromJson(res.data)으로 교체
   static DetectionResult mock() => const DetectionResult(
         productId: 'p001',
-        productName: '사과 (Apple)',
-        productNameAr: 'تفاحة',
+        productName: '포도 (Grapes)',
+        productNameAr: 'عنب',
         confidence: 0.92,
-        detectedPrice: 45.0,
+        detectedPrice: 65.0,
       );
 }

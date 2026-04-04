@@ -12,6 +12,38 @@ class PermissionScreen extends StatelessWidget {
     (Icons.mic, '마이크', '아랍어 발음 가이드 재생에 필요해요'),
   ];
 
+  /// GPS 권한 없이 계속할 때: 기능 제한 안내 다이얼로그
+  void _showLocationWarning(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('위치 권한 없이 계속할까요?'),
+        content: const Text(
+          '위치 권한이 없으면 아래 기능이 제한됩니다:\n\n'
+          '• 지역별 실시간 가격 비교\n'
+          '• 주변 시장 지도\n\n'
+          '대신 카이로(이집트) 기본 데이터를 표시합니다.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('돌아가기'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.go('/intro');
+            },
+            child: const Text(
+              '제한된 기능으로 시작',
+              style: TextStyle(color: AppColors.onSurfaceLight),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +88,7 @@ class PermissionScreen extends StatelessWidget {
               if (!kIsWeb) ...[
                 const SizedBox(height: 12),
                 TextButton(
-                  onPressed: () => context.go('/intro'),
+                  onPressed: () => _showLocationWarning(context),
                   child: const Text(
                     '나중에 설정하기',
                     style: TextStyle(color: AppColors.onSurfaceLight),
