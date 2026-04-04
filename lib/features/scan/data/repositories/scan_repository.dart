@@ -17,30 +17,30 @@ class ScanRepositoryImpl implements ScanRepository {
     required double lon,
   }) async {
     // ──────────────────────────────────────────────────────────────
-    // [YOLO 백엔드 연동 가이드] — 다른 개발자가 작업 예정
+    // [YOLO BACKEND INTEGRATION GUIDE] — to be implemented by another developer
     //
-    // 백엔드(Python/FastAPI)에서 YOLOv8 모델을 실행하고,
-    // 감지된 객체 클래스(class_name)와 OCR로 추출된 가격을 반환한다.
+    // The backend (Python/FastAPI) runs a YOLOv8 model and returns
+    // the detected object class (class_name) and the price extracted via OCR.
     //
-    // 1. pubspec.yaml에 dio 패키지 의존성 활성화:
-    //    lib/core/network/dio_client.dart  →  DioClient.instance 참조
-    //    lib/core/constants/api_endpoints.dart  →  ApiEndpoints.detectObject 참조
+    // 1. Enable the dio package dependency in pubspec.yaml:
+    //    lib/core/network/dio_client.dart  →  DioClient.instance
+    //    lib/core/constants/api_endpoints.dart  →  ApiEndpoints.detectObject
     //
-    // 2. 백엔드 엔드포인트: POST /scan/detect-object
+    // 2. Backend endpoint: POST /scan/detect-object
     //    Request (multipart/form-data):
     //      - image: File (JPEG/PNG)
-    //      - lat: double  (현재 위도)
-    //      - lon: double  (현재 경도)
+    //      - lat: double  (current latitude)
+    //      - lon: double  (current longitude)
     //    Response (JSON):
     //      {
     //        "product_id": "p001",
     //        "name_kr": "포도 (Grapes)",
     //        "name_ar": "عنب",
     //        "confidence": 0.92,
-    //        "detected_price": 65.0   // OCR로 가격표 인식된 경우 (없으면 null)
+    //        "detected_price": 65.0   // price read from tag via OCR (null if not found)
     //      }
     //
-    // 3. 연동 코드 (dio, MultipartFile import 추가 필요):
+    // 3. Integration code (add dio and MultipartFile imports):
     //    final formData = FormData.fromMap({
     //      'image': await MultipartFile.fromFile(image.path),
     //      'lat': lat,
@@ -49,12 +49,12 @@ class ScanRepositoryImpl implements ScanRepository {
     //    final res = await DioClient.instance.post(ApiEndpoints.detectObject, data: formData);
     //    return DetectionResult.fromJson(res.data as Map<String, dynamic>);
     //
-    // 4. ar_flutter_plugin (제안서 명시) 사용 시:
-    //    AR 오버레이로 바운딩 박스 위에 가격을 실시간 표시 가능.
-    //    해당 기능은 별도 AR 화면에서 구현 권장.
+    // 4. When using ar_flutter_plugin (mentioned in proposal):
+    //    AR overlay can display price in real time above the bounding box.
+    //    Recommended to implement this feature in a dedicated AR screen.
     // ──────────────────────────────────────────────────────────────
 
-    // [DEMO] Mock: 2초 딜레이 후 포도 결과 반환
+    // [DEMO] Mock: return grapes result after a 2-second delay
     await Future.delayed(const Duration(seconds: 2));
     return DetectionResult.mock();
   }

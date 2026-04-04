@@ -1,3 +1,9 @@
+// phrase_screen.dart
+// Displays a categorized list of Arabic phrases useful for market shopping.
+// Phrases are loaded from assets/data/phrases.json and shown with Arabic text,
+// romanized pronunciation, and an English label. Each card has a TTS button
+// that speaks the Arabic phrase aloud via TtsService.
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,12 +23,12 @@ class _PhraseScreenState extends State<PhraseScreen> {
   String _selectedCategory = 'all';
 
   static const _categories = [
-    ('all', '전체'),
-    ('greeting', '인사'),
-    ('price_ask', '가격 묻기'),
-    ('too_expensive', '가격 협상'),
-    ('discount', '할인'),
-    ('buy', '구매'),
+    ('all', 'All'),
+    ('greeting', 'Greeting'),
+    ('price_ask', 'Ask Price'),
+    ('too_expensive', 'Negotiate'),
+    ('discount', 'Discount'),
+    ('buy', 'Purchase'),
   ];
 
   @override
@@ -47,7 +53,7 @@ class _PhraseScreenState extends State<PhraseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('아랍어 회화')),
+      appBar: AppBar(title: const Text('Arabic Phrases')),
       body: Column(
         children: [
           _CategoryChips(),

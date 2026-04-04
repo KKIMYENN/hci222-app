@@ -1,3 +1,10 @@
+// user_id_service.dart
+// Purpose: Generates and persists an anonymous UUID for the current device/user.
+//          The ID is passed to submitPrice() so crowdsourced price submissions can be
+//          de-duplicated server-side without requiring user authentication.
+// Storage: SharedPreferences (key: 'anonymous_user_id')
+// TODO(next-dev): Replace with a proper auth token once user accounts are introduced.
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 

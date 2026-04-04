@@ -30,7 +30,7 @@ class PriceBloc extends Bloc<PriceEvent, PriceState> {
       );
       emit(PriceLoaded(stats: stats));
     } catch (e) {
-      emit(PriceError('가격 정보를 불러오지 못했어요. ($e)'));
+      emit(PriceError('Failed to load price data. Please try again. ($e)'));
     }
   }
 
@@ -54,7 +54,7 @@ class PriceBloc extends Bloc<PriceEvent, PriceState> {
       );
       emit(const PriceSubmitSuccess());
     } catch (e) {
-      emit(PriceError('가격 제출에 실패했어요. ($e)'));
+      emit(PriceError('Failed to submit price. Please try again. ($e)'));
     }
   }
 }

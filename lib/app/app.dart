@@ -1,3 +1,9 @@
+// app.dart
+// Purpose: Root MaterialApp.router widget. Configures the global theme (colors, button styles,
+//          app bar style) and wires in the go_router configuration from router.dart.
+// Entry point: instantiated in main.dart → runApp(TruePriceApp()).
+// Dependencies: AppColors, router (GoRouter instance)
+
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 import 'router.dart';

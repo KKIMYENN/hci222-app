@@ -1,3 +1,9 @@
+// splash_screen.dart
+// Purpose: First screen shown on app launch. Displays the app logo and name,
+//          then auto-navigates to /permission after 2 seconds.
+// Navigation flow: / (initial) → /permission
+// Dependencies: AppColors, go_router
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -69,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                '중동 여행자를 위한 물가 가이드',
+                'Price guide for Middle East travelers',
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.8),
                   fontSize: 15,

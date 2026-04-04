@@ -1,3 +1,13 @@
+// region_stats.dart
+// Purpose: Models for the regional price statistics fetched from the backend
+//          (or served from mock data during development).
+//          PriceBucket represents one bar in the histogram.
+//          RegionStats holds the full distribution for a product in a given region.
+// Mock→Real migration: replace RegionStats.mock() with RegionStats.fromJson(res.data)
+//                      once the price-stats API endpoint is live.
+// TODO(next-dev): Add 'currency' and 'unit' fields to RegionStats so the UI can
+//                 display "EGP / kg" instead of hard-coding the unit label.
+
 class PriceBucket {
   final double start;
   final double end;
@@ -47,9 +57,9 @@ class RegionStats {
             .toList(),
       );
 
-  // Mock 데이터 (포도 1kg, 카이로 칸 엘-칼릴리 기준, 단위: EGP)
-  // 제안서 개발 가이드 기준: 포도 40~80 EGP, 평균 55 EGP
-  // TODO: 백엔드 연동 시 RegionStats.fromJson()으로 교체
+  // Mock data: Grapes 1 kg, Khan el-Khalili Market, Cairo (unit: EGP)
+  // Reference values from project proposal: grapes 40–80 EGP, average 55 EGP
+  // TODO(next-dev): Replace with RegionStats.fromJson() once the backend is connected
   static RegionStats mock(String productId) => RegionStats(
         productId: productId,
         avgPrice: 55.0,

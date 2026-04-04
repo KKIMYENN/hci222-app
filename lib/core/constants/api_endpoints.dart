@@ -1,5 +1,5 @@
 class ApiEndpoints {
-  static const String baseUrl = 'https://api.trueprice.app'; // TODO: 백엔드와 확정
+  static const String baseUrl = 'https://api.trueprice.app'; // TODO(next-dev): confirm with backend team
 
   static const String detectObject = '/scan/detect-object';
   static const String extractPrice = '/scan/extract-price';

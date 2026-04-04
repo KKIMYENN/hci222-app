@@ -1,3 +1,18 @@
+// price_repository.dart
+// Purpose: Repository interface + mock implementation for price data.
+//          PriceRepository defines the two operations the app needs:
+//            1. getStats()    — fetch regional price distribution for a product
+//            2. submitPrice() — crowdsource a new price observation from the user
+//          PriceRepositoryImpl currently uses mock data with simulated network delays.
+//
+// Mock→Real migration path:
+//   1. Uncomment the DioClient blocks in getStats() and submitPrice().
+//   2. Import DioClient and ApiEndpoints from the network layer.
+//   3. Delete the RegionStats.mock() call and Future.delayed stubs.
+//   The in-memory cache (_cache) stays in place to reduce redundant API calls.
+//
+// Architecture: injected into the ScanBloc via the constructor; swap mock for real at DI site.
+
 import '../models/region_stats.dart';
 
 abstract class PriceRepository {
@@ -18,7 +33,7 @@ abstract class PriceRepository {
 }
 
 class PriceRepositoryImpl implements PriceRepository {
-  // 단순 인메모리 캐시: 같은 productId는 앱 세션 내 1회만 API 호출
+  // Simple in-memory cache: each productId is fetched at most once per app session
   static final Map<String, RegionStats> _cache = {};
 
   @override
@@ -31,7 +46,7 @@ class PriceRepositoryImpl implements PriceRepository {
       return _cache[productId]!;
     }
 
-    // TODO: 백엔드 연동 시 아래 주석 해제
+    // TODO(next-dev): Uncomment when backend is ready
     // final res = await DioClient.instance.get(
     //   ApiEndpoints.priceStats,
     //   queryParameters: {'product_id': productId, 'lat': lat, 'lon': lon},
@@ -55,7 +70,7 @@ class PriceRepositoryImpl implements PriceRepository {
     required double lon,
     required String userId,
   }) async {
-    // TODO: 백엔드 연동 시 아래 주석 해제
+    // TODO(next-dev): Uncomment when backend is ready
     // await DioClient.instance.post(ApiEndpoints.submitPrice, data: {
     //   'product_id': productId,
     //   'price': price,
@@ -65,11 +80,11 @@ class PriceRepositoryImpl implements PriceRepository {
     //   'user_id': userId,
     // });
 
-    // 가격 제출 후 해당 상품 캐시 무효화 (다음 조회 시 최신 데이터 반영)
+    // Invalidate cache for this product so the next getStats() call returns fresh data
     _cache.remove(productId);
     await Future.delayed(const Duration(milliseconds: 300));
   }
 
-  /// 테스트용 캐시 초기화
+  /// Clears the in-memory cache — useful in tests to force a fresh fetch.
   static void clearCache() => _cache.clear();
 }

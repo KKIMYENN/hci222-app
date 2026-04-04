@@ -1,3 +1,10 @@
+// community_screen.dart
+// Displays a community feed of recent price reports submitted by other users.
+// Each card shows the product name, market, reported price, average price,
+// a percentage badge (fair / high / low), and how long ago it was submitted.
+// All data is currently mocked; replace _mockFeed with a live API call when
+// the backend is available.
+
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/price_classifier.dart';
@@ -7,21 +14,21 @@ import '../../../../core/widgets/price_badge.dart';
 class CommunityScreen extends StatelessWidget {
   const CommunityScreen({super.key});
 
-  // Mock 피드 데이터 (카이로 이집트, 단위: EGP)
-  // 가격 참고: 포도 40-80 EGP, 토마토 5-15 EGP, 오이 5-10 EGP (제안서 개발 가이드 기준)
+  // Mock feed data (Cairo, Egypt — prices in EGP)
+  // Price reference: Grapes 40–80 EGP, Tomatoes 5–15 EGP, Cucumbers 5–10 EGP
   static final _mockFeed = [
-    _MockFeed('포도 1kg', 65.0, 55.0, '칸 엘-칼릴리 시장', '2분 전'),
-    _MockFeed('토마토 1kg', 14.0, 10.0, '알아타바 시장', '15분 전'),
-    _MockFeed('오이 1kg', 6.0, 8.0, '임바바 시장', '32분 전'),
-    _MockFeed('석류 1개', 45.0, 30.0, '칸 엘-칼릴리 시장', '1시간 전'),
-    _MockFeed('레몬 5개', 18.0, 20.0, '알아타바 시장', '2시간 전'),
+    _MockFeed('Grapes 1kg', 65.0, 55.0, 'Khan el-Khalili Market', '2 min ago'),
+    _MockFeed('Tomatoes 1kg', 14.0, 10.0, 'Ataba Market', '15 min ago'),
+    _MockFeed('Cucumbers 1kg', 6.0, 8.0, 'Imbaba Market', '32 min ago'),
+    _MockFeed('Pomegranate 1 pc', 45.0, 30.0, 'Khan el-Khalili Market', '1 hr ago'),
+    _MockFeed('Lemons 5 pcs', 18.0, 20.0, 'Ataba Market', '2 hr ago'),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('커뮤니티'),
+        title: const Text('Community'),
         actions: [
           IconButton(icon: const Icon(Icons.filter_list), onPressed: () {}),
         ],
@@ -35,7 +42,7 @@ class CommunityScreen extends StatelessWidget {
         onPressed: () {},
         backgroundColor: AppColors.primary,
         icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text('가격 공유', style: TextStyle(color: Colors.white)),
+        label: const Text('Share Price', style: TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -106,7 +113,7 @@ class _FeedCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '(평균 ${feed.avgPrice.toStringAsFixed(0)} EGP)',
+                  '(avg. ${feed.avgPrice.toStringAsFixed(0)} EGP)',
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.onSurfaceLight,

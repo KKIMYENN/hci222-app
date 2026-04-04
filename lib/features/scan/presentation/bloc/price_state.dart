@@ -17,7 +17,7 @@ class PriceLoading extends PriceState {
 
 class PriceLoaded extends PriceState {
   final RegionStats stats;
-  final double? userPrice; // 사용자가 입력한 가격 (수직선용)
+  final double? userPrice; // price entered by the user (used for histogram vertical line)
   const PriceLoaded({required this.stats, this.userPrice});
   @override
   List<Object?> get props => [stats, userPrice];

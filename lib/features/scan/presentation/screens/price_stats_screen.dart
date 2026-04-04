@@ -23,12 +23,12 @@ class PriceStatsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayName = productName.isNotEmpty ? productName : '인식된 상품';
+    final displayName = productName.isNotEmpty ? productName : 'Detected product';
     return BlocProvider(
       create: (_) => PriceBloc()
         ..add(PriceStatsRequested(
           productId: productId,
-          lat: 0, // LocationService가 내부에서 실제 좌표 획득
+          lat: 0, // LocationService fetches the real coordinates internally
           lon: 0,
         )),
       child: _PriceStatsView(
@@ -94,13 +94,13 @@ class _PriceStatsView extends StatelessWidget {
           AppCard(
             child: Column(
               children: [
-                _StatsRow('평균가', stats.avgPrice, isPrimary: true),
+                _StatsRow('Average', stats.avgPrice, isPrimary: true),
                 const Divider(height: 20),
                 Row(
                   children: [
-                    Expanded(child: _StatsRow('최저가', stats.minPrice)),
-                    Expanded(child: _StatsRow('최고가', stats.maxPrice)),
-                    Expanded(child: _StatsRow('최빈값', stats.modePrice)),
+                    Expanded(child: _StatsRow('Min', stats.minPrice)),
+                    Expanded(child: _StatsRow('Max', stats.maxPrice)),
+                    Expanded(child: _StatsRow('Mode', stats.modePrice)),
                   ],
                 ),
               ],
@@ -109,20 +109,20 @@ class _PriceStatsView extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          const Text('가격 분포',
+          const Text('Price Distribution',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
-          Text('샘플 데이터 $totalCount건 (데모 — 실제 지역 수집 데이터 아님)',
+          Text('Sample data: $totalCount entries (demo — not real regional data)',
               style:
                   const TextStyle(fontSize: 12, color: AppColors.onSurfaceLight)),
           const SizedBox(height: 8),
           Row(
             children: [
-              _LegendItem(color: AppColors.primary, label: '평균가 구간'),
+              _LegendItem(color: AppColors.primary, label: 'Avg. range'),
               const SizedBox(width: 16),
               if (detectedPrice != null)
                 _LegendItem(
-                    color: AppColors.warning, label: '인식된 가격', isDash: true),
+                    color: AppColors.warning, label: 'Scanned price', isDash: true),
             ],
           ),
           const SizedBox(height: 8),
@@ -135,7 +135,7 @@ class _PriceStatsView extends StatelessWidget {
               'productName': displayName,
               'productId': productId,
             }),
-            child: const Text('상인이 제시한 가격 입력하기'),
+            child: const Text("Enter Seller's Price"),
           ),
         ],
       ),
@@ -198,7 +198,7 @@ class _LegendItem extends StatelessWidget {
   }
 }
 
-/// 재사용 가능한 히스토그램 위젯 (수직선 오버레이 포함)
+/// Reusable histogram widget with optional vertical-line overlay for the user's price.
 class PriceHistogramWidget extends StatelessWidget {
   final RegionStats stats;
   final double? userPrice;

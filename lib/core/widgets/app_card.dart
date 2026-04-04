@@ -1,7 +1,14 @@
+// app_card.dart
+// Purpose: Reusable card container and error widget used throughout the app.
+//          AppCard wraps content in a rounded white surface with a subtle drop shadow.
+//          AppErrorWidget shows a standardised error state with an optional retry button.
+// Dependencies: AppColors
+
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 
-/// 앱 전체에서 공통으로 사용하는 카드 컨테이너
+/// Shared card container used across the app.
+/// Wraps [child] in a rounded, shadowed surface panel.
 class AppCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -38,7 +45,7 @@ class AppCard extends StatelessWidget {
   }
 }
 
-/// 에러 상태 공통 UI (재시도 버튼 포함)
+/// Common error-state UI widget with an optional retry button.
 class AppErrorWidget extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
@@ -69,7 +76,7 @@ class AppErrorWidget extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: const Text('다시 시도'),
+                label: const Text('Retry'),
               ),
             ],
           ],

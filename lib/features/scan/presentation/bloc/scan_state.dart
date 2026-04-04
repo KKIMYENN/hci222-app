@@ -1,3 +1,7 @@
+// scan_state.dart
+// States emitted by ScanBloc during the image-capture → detection flow.
+// ScanInitial → ScanProcessing → ScanDetected | ScanError
+
 import 'package:equatable/equatable.dart';
 import '../../data/models/detection_result.dart';
 

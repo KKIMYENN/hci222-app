@@ -1,3 +1,10 @@
+// permission_screen.dart
+// Purpose: Explains the three permissions the app needs (camera, location, mic)
+//          and prompts the user to grant them before entering the main app.
+// Navigation flow: /permission (from splash) → /intro
+//                  "Skip" path: shows a warning dialog then also goes to /intro
+// Dependencies: AppColors, go_router, kIsWeb (web skips native permission request)
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -6,28 +13,30 @@ import '../../../../core/constants/app_colors.dart';
 class PermissionScreen extends StatelessWidget {
   const PermissionScreen({super.key});
 
+  // List of (icon, title, description) tuples for each required permission
   static const _permissions = [
-    (Icons.camera_alt, '카메라', '상품 스캔 및 가격표 인식에 필요해요'),
-    (Icons.location_on, '위치', '주변 시장 검색 및 지역 물가 비교에 필요해요'),
-    (Icons.mic, '마이크', '아랍어 발음 가이드 재생에 필요해요'),
+    (Icons.camera_alt, 'Camera', 'Required to scan products and recognize price tags'),
+    (Icons.location_on, 'Location', 'Required to search nearby markets and compare local prices'),
+    (Icons.mic, 'Microphone', 'Required to play Arabic pronunciation guides'),
   ];
 
-  /// GPS 권한 없이 계속할 때: 기능 제한 안내 다이얼로그
+  /// Shows a warning dialog when the user tries to proceed without granting location permission.
+  /// Informs the user that region-specific features will be disabled and Cairo defaults will be used.
   void _showLocationWarning(BuildContext context) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('위치 권한 없이 계속할까요?'),
+        title: const Text('Continue without location permission?'),
         content: const Text(
-          '위치 권한이 없으면 아래 기능이 제한됩니다:\n\n'
-          '• 지역별 실시간 가격 비교\n'
-          '• 주변 시장 지도\n\n'
-          '대신 카이로(이집트) 기본 데이터를 표시합니다.',
+          'Without location permission, the following features will be limited:\n\n'
+          '• Real-time price comparison by region\n'
+          '• Nearby market map\n\n'
+          'Default data for Cairo, Egypt will be shown instead.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('돌아가기'),
+            child: const Text('Go back'),
           ),
           TextButton(
             onPressed: () {
@@ -35,7 +44,7 @@ class PermissionScreen extends StatelessWidget {
               context.go('/intro');
             },
             child: const Text(
-              '제한된 기능으로 시작',
+              'Continue with limited features',
               style: TextStyle(color: AppColors.onSurfaceLight),
             ),
           ),
@@ -56,7 +65,7 @@ class PermissionScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 40),
               const Text(
-                '앱 사용 권한',
+                'App Permissions',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -65,7 +74,7 @@ class PermissionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                '원활한 서비스 이용을 위해\n아래 권한이 필요해요',
+                'The following permissions are required\nfor the best experience',
                 style: TextStyle(
                   fontSize: 15,
                   color: AppColors.onSurfaceLight,
@@ -83,14 +92,15 @@ class PermissionScreen extends StatelessWidget {
               const Spacer(),
               ElevatedButton(
                 onPressed: () => context.go('/intro'),
-                child: Text(kIsWeb ? '시작하기' : '권한 허용하고 시작하기'),
+                // On web, native permission APIs are not available, so skip the request label
+                child: Text(kIsWeb ? 'Get Started' : 'Allow permissions & get started'),
               ),
               if (!kIsWeb) ...[
                 const SizedBox(height: 12),
                 TextButton(
                   onPressed: () => _showLocationWarning(context),
                   child: const Text(
-                    '나중에 설정하기',
+                    'Set up later',
                     style: TextStyle(color: AppColors.onSurfaceLight),
                   ),
                 ),

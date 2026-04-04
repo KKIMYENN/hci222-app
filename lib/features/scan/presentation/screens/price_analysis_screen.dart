@@ -52,7 +52,7 @@ class _PriceAnalysisView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('가격 분석 결과'),
+        title: const Text('Price Analysis'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/scan'),
@@ -99,7 +99,7 @@ class _PriceAnalysisView extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          // 메인 결과 카드
+          // Main result card
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(28),
@@ -127,12 +127,12 @@ class _PriceAnalysisView extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // 히스토그램 (수직선)
+          // Histogram (with vertical line)
           AppCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('가격 분포 내 위치',
+                const Text('Price Distribution',
                     style: TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 14)),
                 const SizedBox(height: 12),
@@ -143,14 +143,14 @@ class _PriceAnalysisView extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // 비교 수치
+          // Comparison figures
           AppCard(
             child: _CompareContent(inputPrice: inputPrice, stats: stats),
           ),
 
           const SizedBox(height: 20),
 
-          // 협상 가이드
+          // Negotiation guide
           if (status != PriceStatus.safe)
             AppCard(
               child: _NegotiationContent(
@@ -165,7 +165,7 @@ class _PriceAnalysisView extends StatelessWidget {
               'productId': productId,
               'finalPrice': inputPrice,
             }),
-            child: const Text('이 가격에 구매했어요'),
+            child: const Text('I bought at this price'),
           ),
           const SizedBox(height: 12),
           OutlinedButton(
@@ -178,7 +178,7 @@ class _PriceAnalysisView extends StatelessWidget {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text('다른 가격으로 다시 분석'),
+            child: const Text('Re-analyze with a different price'),
           ),
         ],
       ),
@@ -200,13 +200,13 @@ class _CompareContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('지역 평균가 비교',
+        const Text('vs. Regional Average',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _StatItem('제시 가격', inputPrice, bold: true),
+            _StatItem('Offered Price', inputPrice, bold: true),
             Column(
               children: [
                 Icon(
@@ -223,7 +223,7 @@ class _CompareContent extends StatelessWidget {
                 ),
               ],
             ),
-            _StatItem('지역 평균', stats.avgPrice),
+            _StatItem('Regional Avg.', stats.avgPrice),
           ],
         ),
       ],
@@ -275,22 +275,22 @@ class _NegotiationContent extends StatelessWidget {
           children: [
             Icon(Icons.handshake, color: AppColors.primary, size: 20),
             SizedBox(width: 8),
-            Text('협상 가이드',
+            Text('Negotiation Guide',
                 style:
                     TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
           ],
         ),
         const SizedBox(height: 12),
-        Text('목표 가격: $targetPrice EGP 이하로 흥정해보세요',
+        Text('Target: negotiate below $targetPrice EGP',
             style: const TextStyle(fontSize: 14)),
         const SizedBox(height: 12),
-        const Text('협상 문구',
+        const Text('Useful phrases',
             style: TextStyle(
                 fontSize: 12, color: AppColors.onSurfaceLight)),
         const SizedBox(height: 8),
-        _PhraseChip('너무 비싸요', 'هذا غالي جداً'),
+        _PhraseChip('Too expensive', 'هذا غالي جداً'),
         const SizedBox(height: 6),
-        _PhraseChip('깎아주세요', 'خفّض السعر من فضلك'),
+        _PhraseChip('Please give a discount', 'خفّض السعر من فضلك'),
       ],
     );
   }

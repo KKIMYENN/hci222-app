@@ -11,7 +11,7 @@ class ScanImageCaptured extends ScanEvent {
   final File image;
   const ScanImageCaptured(this.image);
 
-  // File 자체는 equatable 비교 불가 → path + lastModified로 식별
+  // File itself is not equatable — use path + lastModified for identity
   @override
   List<Object?> get props => [image.path, image.lastModifiedSync()];
 }
@@ -20,7 +20,7 @@ class ScanReset extends ScanEvent {
   const ScanReset();
 }
 
-/// 웹 환경에서 이미지 파일 접근이 불가능할 때 Mock 결과로 직행
+/// Used on web where File access is unavailable — skips detection and returns a mock result directly.
 class ScanWebMockRequested extends ScanEvent {
   const ScanWebMockRequested();
 }

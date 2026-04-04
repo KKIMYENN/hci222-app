@@ -1,10 +1,18 @@
+// price_classifier.dart
+// Purpose: Pure utility class for classifying an observed price relative to regional statistics.
+//          Uses a z-score approach. Consumed by ScanScreen BLoC and PriceAnalysisScreen.
+// Architecture note: no Flutter dependencies — safe to unit-test without a widget tree.
+
+/// Three-tier price status used across the UI (badge color, Arabic phrase selection, etc.)
 enum PriceStatus { safe, negotiable, warning }
 
 class PriceClassifier {
-  /// z-score 기반 가격 분류
-  /// z > 1.5  → warning (Red)
-  /// z > 0.0  → negotiable (Yellow)
-  /// z <= 0.0 → safe (Green)
+  /// Classifies [observed] price using a z-score against [avg] and [stdDev].
+  ///
+  /// Thresholds:
+  ///   z > 1.5  → warning    (Red  — significantly overpriced)
+  ///   z > 0.0  → negotiable (Yellow — slightly above average)
+  ///   z <= 0.0 → safe       (Green — at or below average)
   static PriceStatus classify({
     required double observed,
     required double avg,
@@ -19,21 +27,21 @@ class PriceClassifier {
     return PriceStatus.safe;
   }
 
-  /// 평균 대비 차이(%) 계산
+  /// Returns how many percent [observed] differs from [avg] (positive = above average).
   static double percentDiff(double observed, double avg) {
     if (avg == 0) return 0;
     return (observed - avg) / avg * 100;
   }
 
-  /// 상태별 안내 메시지
+  /// Human-readable status message shown on the analysis screen.
   static String statusMessage(PriceStatus status, double percent) {
     switch (status) {
       case PriceStatus.safe:
-        return '적정 가격이에요 (평균보다 ${percent.abs().toStringAsFixed(0)}% 저렴)';
+        return 'Great price! Below average.';
       case PriceStatus.negotiable:
-        return '흥정 가능해요 (평균보다 ${percent.toStringAsFixed(0)}% 비쌈)';
+        return 'Negotiate. ${percent.toStringAsFixed(0)}% above average.';
       case PriceStatus.warning:
-        return '바가지 주의! (평균보다 ${percent.toStringAsFixed(0)}% 비쌈)';
+        return 'Overpriced! ${percent.toStringAsFixed(0)}% above average.';
     }
   }
 }

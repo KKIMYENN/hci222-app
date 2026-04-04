@@ -83,7 +83,7 @@ class _FinalPriceViewState extends State<_FinalPriceView>
     ));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('가격 정보를 공유해 주셔서 감사해요! 🙏'),
+        content: Text('Thanks for sharing your price! 🙏'),
         backgroundColor: AppColors.primary,
       ),
     );
@@ -97,7 +97,7 @@ class _FinalPriceViewState extends State<_FinalPriceView>
     return BlocListener<PriceBloc, PriceState>(
       listener: (context, state) {
         if (state is PriceError) {
-          setState(() => _submitted = false); // 실패 시 재시도 허용
+          setState(() => _submitted = false); // allow retry on failure
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
@@ -108,7 +108,7 @@ class _FinalPriceViewState extends State<_FinalPriceView>
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('구매 완료'),
+          title: const Text('Purchase Complete'),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () => context.go('/scan'),
@@ -148,7 +148,7 @@ class _FinalPriceViewState extends State<_FinalPriceView>
                     fontSize: 42, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              const Text('에 구매 완료!', style: TextStyle(fontSize: 20)),
+              const Text('Purchase complete!', style: TextStyle(fontSize: 20)),
 
               const SizedBox(height: 40),
 
@@ -165,14 +165,14 @@ class _FinalPriceViewState extends State<_FinalPriceView>
                     Icon(Icons.people, color: AppColors.primary, size: 32),
                     SizedBox(height: 12),
                     Text(
-                      '다른 여행자에게 도움을 주세요',
+                      'Help other travelers',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 8),
                     Text(
-                      '구매한 가격을 공유하면\n다른 여행자들의 물가 데이터가 더 정확해져요',
+                      'Sharing your price helps other travelers get more accurate price data',
                       style: TextStyle(
                         fontSize: 13,
                         color: AppColors.onSurfaceLight,
@@ -188,13 +188,13 @@ class _FinalPriceViewState extends State<_FinalPriceView>
 
               ElevatedButton(
                 onPressed: _submitted ? null : _submit,
-                child: Text(_submitted ? '공유 완료!' : '가격 공유하기'),
+                child: Text(_submitted ? 'Shared!' : 'Share price'),
               ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () => context.go('/scan'),
                 child: const Text(
-                  '공유하지 않고 돌아가기',
+                  'Go back without sharing',
                   style: TextStyle(color: AppColors.onSurfaceLight),
                 ),
               ),

@@ -1,3 +1,11 @@
+// tts_service.dart
+// Purpose: Singleton wrapper around flutter_tts for Arabic text-to-speech playback.
+//          Used by PhraseScreen (language tab) to pronounce Arabic negotiation phrases.
+// Note: flutter_tts does not support web — all methods are no-ops on kIsWeb.
+//       The device must have the Arabic (ar-SA) language pack installed for playback to work.
+// TODO(next-dev): Show a UI prompt guiding the user to install the Arabic TTS voice pack
+//                 if speakArabic() returns false on a non-web platform.
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
@@ -11,7 +19,7 @@ class TtsService {
 
   Future<void> _init() async {
     if (_initialized) return;
-    // flutter_tts는 웹 미지원 — 초기화 건너뜀
+    // flutter_tts does not support web — skip initialization
     if (kIsWeb) {
       _initialized = true;
       return;
@@ -23,15 +31,15 @@ class TtsService {
       await _tts.setPitch(1.0);
       _initialized = true;
     } catch (e) {
-      debugPrint('[TtsService] 초기화 실패: $e');
-      _initialized = true; // 실패해도 재시도 막기
+      debugPrint('[TtsService] Initialization failed: $e');
+      _initialized = true; // Mark as initialized even on failure to prevent retry loops
     }
   }
 
-  /// 아랍어 텍스트 발음. 웹/언어팩 미설치 시 false 반환.
+  /// Speaks [text] in Arabic (ar-SA). Returns false on web or if the language pack is missing.
   Future<bool> speakArabic(String text) async {
     if (kIsWeb) {
-      debugPrint('[TtsService] 웹 환경: TTS 미지원');
+      debugPrint('[TtsService] Web environment: TTS not supported');
       return false;
     }
     await _init();
@@ -41,7 +49,7 @@ class TtsService {
       await _tts.speak(text);
       return true;
     } catch (e) {
-      debugPrint('[TtsService] 발음 실패: $e');
+      debugPrint('[TtsService] Playback failed: $e');
       return false;
     }
   }
@@ -51,7 +59,7 @@ class TtsService {
     try {
       await _tts.stop();
     } catch (e) {
-      debugPrint('[TtsService] stop 실패: $e');
+      debugPrint('[TtsService] Stop failed: $e');
     }
   }
 }

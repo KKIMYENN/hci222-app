@@ -32,11 +32,11 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
       );
       emit(ScanDetected(result));
     } catch (e) {
-      emit(ScanError('상품 인식에 실패했어요. 다시 시도해주세요.\n($e)'));
+      emit(ScanError('Failed to detect product. Please try again.\n($e)'));
     }
   }
 
-  /// 웹에서 File 접근 불가 시 Mock 결과 직행
+  /// On web where File access is unavailable — skips detection and emits a mock result directly.
   Future<void> _onWebMock(
     ScanWebMockRequested event,
     Emitter<ScanState> emit,

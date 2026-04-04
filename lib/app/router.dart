@@ -1,3 +1,23 @@
+// router.dart
+// Purpose: Defines the full navigation graph for the app using go_router.
+//
+// Route tree:
+//   /            → SplashScreen    (auto-redirects to /permission after 2 s)
+//   /permission  → PermissionScreen
+//   /intro       → IntroScreen
+//   ShellRoute (with AppBottomNavBar):
+//     /scan              → ScanScreen
+//     /scan/stats        → PriceStatsScreen   (extra: productName, productId, detectedPrice?)
+//     /scan/input        → PriceInputScreen   (extra: productName, productId)
+//     /scan/analysis     → PriceAnalysisScreen(extra: productName, productId, inputPrice)
+//     /scan/final        → FinalPriceScreen   (extra: productName, productId, finalPrice)
+//     /map               → MarketMapScreen
+//     /language          → PhraseScreen
+//     /community         → CommunityScreen
+//
+// Data passing: route parameters are passed via GoRouter's [extra] map (Map<String, dynamic>).
+//               The _ExtraX extension provides null-safe typed getters.
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../core/widgets/bottom_nav_bar.dart';
@@ -13,7 +33,7 @@ import '../features/market_map/presentation/screens/market_map_screen.dart';
 import '../features/language/presentation/screens/phrase_screen.dart';
 import '../features/community/presentation/screens/community_screen.dart';
 
-// extra Map에서 타입 안전하게 값을 꺼내는 헬퍼
+// Helper extension: type-safe getters for values passed via GoRouter's [extra] map
 extension _ExtraX on Map<String, dynamic> {
   String str(String key, [String fallback = '']) =>
       this[key] as String? ?? fallback;

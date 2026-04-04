@@ -1,3 +1,9 @@
+// intro_screen.dart
+// Purpose: Three-page onboarding carousel that introduces the app's core features:
+//          scan, price comparison, and negotiation. Last page "Get Started" navigates to /scan.
+// Navigation flow: /intro (from permission) → /scan (on finish or skip)
+// Dependencies: AppColors, go_router
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -13,21 +19,22 @@ class _IntroScreenState extends State<IntroScreen> {
   final _controller = PageController();
   int _currentPage = 0;
 
+  // Intro pages: each describes one core feature of the app
   static const _pages = [
     _IntroPage(
       icon: Icons.camera_alt,
-      title: '상품을 스캔하세요',
-      desc: '카메라로 과일, 채소 등 시장 상품을\n촬영하면 자동으로 인식해요',
+      title: 'Scan Products',
+      desc: 'Point your camera at fruits, vegetables,\nor any market item to identify it automatically',
     ),
     _IntroPage(
       icon: Icons.bar_chart,
-      title: '물가를 비교하세요',
-      desc: '해당 지역의 평균가, 최저/최고가를\n히스토그램으로 한눈에 확인해요',
+      title: 'Compare Prices',
+      desc: 'See the average, lowest, and highest prices\nfor your region in a clear histogram',
     ),
     _IntroPage(
       icon: Icons.handshake,
-      title: '자신있게 흥정하세요',
-      desc: '색상으로 한눈에 파악하고\n아랍어 협상 문구로 당당하게 대화해요',
+      title: 'Negotiate with Confidence',
+      desc: 'Understand the fair price at a glance\nand use Arabic phrases to bargain confidently',
     ),
   ];
 
@@ -60,7 +67,7 @@ class _IntroScreenState extends State<IntroScreen> {
               child: TextButton(
                 onPressed: () => context.go('/scan'),
                 child: const Text(
-                  '건너뛰기',
+                  'Skip',
                   style: TextStyle(color: AppColors.onSurfaceLight),
                 ),
               ),
@@ -97,7 +104,7 @@ class _IntroScreenState extends State<IntroScreen> {
               child: ElevatedButton(
                 onPressed: _next,
                 child: Text(
-                  _currentPage < _pages.length - 1 ? '다음' : '시작하기',
+                  _currentPage < _pages.length - 1 ? 'Next' : 'Get Started',
                 ),
               ),
             ),

@@ -1,3 +1,9 @@
+// market_map_screen.dart
+// Displays an interactive OpenStreetMap with markers for nearby Cairo markets.
+// Tapping a marker opens a bottom sheet with market details and a directions button.
+// Mock data is used for the three hardcoded markets; replace with GET /markets/nearby
+// when the backend is ready.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -11,19 +17,19 @@ class MarketMapScreen extends StatefulWidget {
 }
 
 class _MarketMapScreenState extends State<MarketMapScreen> {
-  // Mock 시장 데이터 (카이로, 이집트)
-  // TODO: 백엔드 연동 시 GET /markets/nearby?lat=&lon= 로 교체
+  // Mock market data (Cairo, Egypt)
+  // TODO: Replace with GET /markets/nearby?lat=&lon= when backend is ready
   final _mockMarkets = [
-    _MockMarket('칸 엘-칼릴리 (Khan el-Khalili)', 30.0478, 31.2625, '카이로 최대 전통시장·souq'),
-    _MockMarket('알아타바 시장 (Ataba Market)', 30.0565, 31.2457, '과일·채소·향신료 전문'),
-    _MockMarket('임바바 시장 (Imbaba Market)', 30.0720, 31.2130, '신선 과일·채소 특화'),
+    _MockMarket('Khan el-Khalili', 30.0478, 31.2625, "Cairo's largest traditional market & souq"),
+    _MockMarket('Ataba Market', 30.0565, 31.2457, 'Specializes in fruit, vegetables & spices'),
+    _MockMarket('Imbaba Market', 30.0720, 31.2130, 'Focused on fresh fruit & vegetables'),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('주변 시장'),
+        title: const Text('Nearby Markets'),
         actions: [
           IconButton(
             icon: const Icon(Icons.my_location),
@@ -35,7 +41,7 @@ class _MarketMapScreenState extends State<MarketMapScreen> {
         children: [
           FlutterMap(
             options: MapOptions(
-              initialCenter: const LatLng(30.0478, 31.2625), // 카이로 칸 엘-칼릴리
+              initialCenter: const LatLng(30.0478, 31.2625), // Cairo — Khan el-Khalili
               initialZoom: 13,
             ),
             children: [
@@ -125,7 +131,7 @@ class _MarketMapScreenState extends State<MarketMapScreen> {
             ElevatedButton.icon(
               onPressed: () => Navigator.pop(context),
               icon: const Icon(Icons.directions),
-              label: const Text('길찾기'),
+              label: const Text('Get Directions'),
             ),
           ],
         ),

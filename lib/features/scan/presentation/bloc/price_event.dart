@@ -1,3 +1,8 @@
+// price_event.dart
+// Events dispatched to PriceBloc.
+// PriceStatsRequested — fetch regional price statistics for a product.
+// PriceSubmitted      — submit the user's observed purchase price.
+
 import 'package:equatable/equatable.dart';
 
 abstract class PriceEvent extends Equatable {

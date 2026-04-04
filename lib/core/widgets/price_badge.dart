@@ -1,3 +1,10 @@
+// price_badge.dart
+// Purpose: Colored badge widget that displays the price classification status (safe/negotiable/warning).
+//          Used on PriceStatsScreen and PriceAnalysisScreen to give a quick visual signal.
+// The [label] string (e.g. "Fair Price", "Negotiate", "Overpriced") is provided by the caller
+// and is already translated at the call site (see price_classifier.dart statusMessage).
+// Dependencies: AppColors, PriceClassifier (PriceStatus enum)
+
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../utils/price_classifier.dart';

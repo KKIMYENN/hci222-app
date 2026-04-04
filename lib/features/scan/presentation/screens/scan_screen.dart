@@ -32,14 +32,14 @@ class _ScanViewState extends State<_ScanView> {
   final _picker = ImagePicker();
 
   Future<void> _pickAndScan(ImageSource source) async {
-    // 웹에서는 카메라 미지원 → 갤러리 fallback
+    // Camera not supported on web — fall back to gallery
     final effectiveSource =
         (kIsWeb && source == ImageSource.camera) ? ImageSource.gallery : source;
 
     if (kIsWeb && source == ImageSource.camera) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('웹에서는 갤러리에서 이미지를 선택해주세요'),
+          content: Text('On web, please select an image from the gallery.'),
           duration: Duration(seconds: 2),
         ),
       );
@@ -48,9 +48,9 @@ class _ScanViewState extends State<_ScanView> {
     final picked = await _picker.pickImage(source: effectiveSource);
     if (picked == null || !mounted) return;
 
-    // 웹: XFile.path는 blob URL → File() 사용 불가, bytes로 처리
+    // Web: XFile.path is a blob URL — File() cannot be used; handle via bytes
     if (kIsWeb) {
-      // Web에서는 ScanBloc에 File 전달 대신 Mock 결과로 직행
+      // On web, skip passing a File to ScanBloc and go straight to a mock result
       context.read<ScanBloc>().add(const ScanWebMockRequested());
     } else {
       context.read<ScanBloc>().add(ScanImageCaptured(File(picked.path)));
@@ -74,7 +74,7 @@ class _ScanViewState extends State<_ScanView> {
               content: Text(state.message),
               backgroundColor: AppColors.warning,
               action: SnackBarAction(
-                label: '다시 시도',
+                label: 'Retry',
                 textColor: Colors.white,
                 onPressed: () => context.read<ScanBloc>().add(const ScanReset()),
               ),
@@ -91,8 +91,8 @@ class _ScanViewState extends State<_ScanView> {
             body: Stack(
               fit: StackFit.expand,
               children: [
-                // 카메라 뷰파인더 (데모 모드 — 실제 카메라 미연동)
-                // TODO: camera 패키지의 CameraPreview 위젯으로 교체 예정
+                // Camera viewfinder (demo mode — real camera not connected)
+                // TODO: replace with CameraPreview widget from the camera package
                 Container(
                   color: Colors.black87,
                   child: Center(
@@ -106,7 +106,7 @@ class _ScanViewState extends State<_ScanView> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          '상품을 화면 중앙에 맞춰주세요',
+                          'Center the product in the frame',
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.5),
                             fontSize: 14,
@@ -121,7 +121,7 @@ class _ScanViewState extends State<_ScanView> {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Text(
-                            '데모 모드 — 갤러리 이미지 선택 후 샘플 결과 반환',
+                            'Demo mode — select a gallery image to get sample results',
                             style:
                                 TextStyle(color: Colors.white, fontSize: 11),
                           ),
@@ -131,7 +131,7 @@ class _ScanViewState extends State<_ScanView> {
                   ),
                 ),
 
-                // 스캔 오버레이 프레임
+                // Scan overlay frame
                 Center(
                   child: Container(
                     width: 260,
@@ -151,7 +151,7 @@ class _ScanViewState extends State<_ScanView> {
                   ),
                 ),
 
-                // 상단 AppBar
+                // Top AppBar
                 Positioned(
                   top: 0,
                   left: 0,
@@ -180,7 +180,7 @@ class _ScanViewState extends State<_ScanView> {
                   ),
                 ),
 
-                // 처리 중 인디케이터
+                // Processing indicator
                 if (isProcessing)
                   Container(
                     color: AppColors.overlay,
@@ -191,7 +191,7 @@ class _ScanViewState extends State<_ScanView> {
                           CircularProgressIndicator(color: AppColors.scanLine),
                           SizedBox(height: 16),
                           Text(
-                            '[데모] 샘플 가격 데이터를 불러오는 중...',
+                            '[DEMO] Loading sample price data...',
                             style: TextStyle(color: Colors.white, fontSize: 14),
                           ),
                         ],
@@ -199,7 +199,7 @@ class _ScanViewState extends State<_ScanView> {
                     ),
                   ),
 
-                // 하단 버튼
+                // Bottom buttons
                 if (!isProcessing)
                   Positioned(
                     bottom: 0,
@@ -214,7 +214,7 @@ class _ScanViewState extends State<_ScanView> {
                               onPressed: () => context.go('/scan/input',
                                   extra: {'productName': '', 'productId': 'p001'}),
                               child: const Text(
-                                '가격만 직접 입력하기',
+                                'Enter price manually',
                                 style: TextStyle(color: Colors.white70),
                               ),
                             ),
@@ -224,19 +224,19 @@ class _ScanViewState extends State<_ScanView> {
                               children: [
                                 _ScanButton(
                                   icon: Icons.photo_library,
-                                  label: '갤러리',
+                                  label: 'Gallery',
                                   onTap: () => _pickAndScan(ImageSource.gallery),
                                   small: true,
                                 ),
                                 _ScanButton(
                                   icon: Icons.camera_alt,
-                                  label: '스캔',
+                                  label: 'Scan',
                                   onTap: () => _pickAndScan(ImageSource.camera),
                                   small: false,
                                 ),
                                 _ScanButton(
                                   icon: Icons.history,
-                                  label: '기록',
+                                  label: 'History',
                                   onTap: () {},
                                   small: true,
                                 ),
