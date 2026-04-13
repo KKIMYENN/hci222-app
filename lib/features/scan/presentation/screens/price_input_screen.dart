@@ -39,9 +39,9 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
   // Supported units. Display label → internal key.
   // Step size: kg uses 0.5 increments; others use 1.
   static const _unitOptions = [
-    _UnitOption(key: 'kg',    label: 'kg',     step: 0.5),
-    _UnitOption(key: 'pcs',   label: 'pcs',    step: 1.0),
-    _UnitOption(key: 'bunch', label: 'bunch',  step: 1.0),
+    _UnitOption(key: 'kg', label: 'kg', step: 0.5),
+    _UnitOption(key: 'pcs', label: 'pcs', step: 1.0),
+    _UnitOption(key: 'bunch', label: 'bunch', step: 1.0),
   ];
 
   _UnitOption _selectedUnit = _unitOptions[0]; // default: kg
@@ -92,11 +92,16 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
     if (!_hasInput) return;
     // Pass the per-unit price so PriceAnalysisScreen can compare
     // it directly against the regional average (which is also per unit).
-    context.go('/scan/analysis', extra: {
-      'productName': widget.productName.isNotEmpty ? widget.productName : 'Product',
-      'productId': widget.productId,
-      'inputPrice': _perUnitPrice, // EGP per kg / per pc / per bunch
-    });
+    context.go(
+      '/scan/analysis',
+      extra: {
+        'productName': widget.productName.isNotEmpty
+            ? widget.productName
+            : 'Product',
+        'productId': widget.productId,
+        'inputPrice': _perUnitPrice, // EGP per kg / per pc / per bunch
+      },
+    );
   }
 
   @override
@@ -107,8 +112,9 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final displayName =
-        widget.productName.isNotEmpty ? widget.productName : 'Product';
+    final displayName = widget.productName.isNotEmpty
+        ? widget.productName
+        : 'Product';
     final displayTotal = _useSlider
         ? _sliderValue.toStringAsFixed(0)
         : (_priceController.text.isNotEmpty ? _priceController.text : '0');
@@ -188,10 +194,12 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
                         : TextField(
                             controller: _priceController,
                             keyboardType: const TextInputType.numberWithOptions(
-                                decimal: true),
+                              decimal: true,
+                            ),
                             inputFormatters: [
                               FilteringTextInputFormatter.allow(
-                                  RegExp(r'[0-9.]')),
+                                RegExp(r'[0-9.]'),
+                              ),
                             ],
                             style: const TextStyle(
                               fontSize: 32,
@@ -228,7 +236,9 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
                   Text(
                     _sliderMin.toInt().toString(),
                     style: const TextStyle(
-                        fontSize: 11, color: AppColors.onSurfaceLight),
+                      fontSize: 11,
+                      color: AppColors.onSurfaceLight,
+                    ),
                   ),
                   Expanded(
                     child: Slider(
@@ -244,7 +254,9 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
                   Text(
                     _sliderMax.toInt().toString(),
                     style: const TextStyle(
-                        fontSize: 11, color: AppColors.onSurfaceLight),
+                      fontSize: 11,
+                      color: AppColors.onSurfaceLight,
+                    ),
                   ),
                 ],
               ),
@@ -306,8 +318,7 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
             // This is the value that will be compared to the regional average.
             Container(
               width: double.infinity,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: _hasInput
                     ? AppColors.primary.withOpacity(0.06)
@@ -321,13 +332,18 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.calculate_outlined,
-                      size: 18, color: AppColors.onSurfaceLight),
+                  const Icon(
+                    Icons.calculate_outlined,
+                    size: 18,
+                    color: AppColors.onSurfaceLight,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'Per ${_selectedUnit.label}:  ',
                     style: const TextStyle(
-                        fontSize: 14, color: AppColors.onSurfaceLight),
+                      fontSize: 14,
+                      color: AppColors.onSurfaceLight,
+                    ),
                   ),
                   Text(
                     _hasInput && _quantity > 0
@@ -344,9 +360,11 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
                   if (_quantity > _selectedUnit.step) ...[
                     const SizedBox(width: 6),
                     Text(
-                      '(${displayTotal} EGP ÷ $_quantityLabel ${_selectedUnit.label})',
+                      '($displayTotal EGP ÷ $_quantityLabel ${_selectedUnit.label})',
                       style: const TextStyle(
-                          fontSize: 11, color: AppColors.onSurfaceLight),
+                        fontSize: 11,
+                        color: AppColors.onSurfaceLight,
+                      ),
                     ),
                   ],
                 ],
@@ -402,16 +420,10 @@ class _QuantityStepper extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
             child: Text(
               value,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
-          _StepButton(
-            icon: Icons.add,
-            onTap: onIncrement,
-          ),
+          _StepButton(icon: Icons.add, onTap: onIncrement),
         ],
       ),
     );

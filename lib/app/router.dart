@@ -48,16 +48,16 @@ Map<String, dynamic> _extra(GoRouterState s) =>
 final router = GoRouter(
   initialLocation: '/',
   routes: [
-    GoRoute(path: '/', builder: (_, __) => const SplashScreen()),
-    GoRoute(path: '/permission', builder: (_, __) => const PermissionScreen()),
-    GoRoute(path: '/intro', builder: (_, __) => const IntroScreen()),
+    GoRoute(path: '/', builder: (_, _) => const SplashScreen()),
+    GoRoute(path: '/permission', builder: (_, _) => const PermissionScreen()),
+    GoRoute(path: '/intro', builder: (_, _) => const IntroScreen()),
 
     ShellRoute(
       builder: (context, state, child) => _MainShell(child: child),
       routes: [
         GoRoute(
           path: '/scan',
-          builder: (_, __) => const ScanScreen(),
+          builder: (_, _) => const ScanScreen(),
           routes: [
             GoRoute(
               path: 'stats',
@@ -104,9 +104,9 @@ final router = GoRouter(
             ),
           ],
         ),
-        GoRoute(path: '/map', builder: (_, __) => const MarketMapScreen()),
-        GoRoute(path: '/language', builder: (_, __) => const PhraseScreen()),
-        GoRoute(path: '/community', builder: (_, __) => const CommunityScreen()),
+        GoRoute(path: '/map', builder: (_, _) => const MarketMapScreen()),
+        GoRoute(path: '/language', builder: (_, _) => const PhraseScreen()),
+        GoRoute(path: '/community', builder: (_, _) => const CommunityScreen()),
       ],
     ),
   ],
@@ -128,8 +128,9 @@ class _MainShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: child,
-      bottomNavigationBar:
-          AppBottomNavBar(currentIndex: _currentIndex(context)),
+      bottomNavigationBar: AppBottomNavBar(
+        currentIndex: _currentIndex(context),
+      ),
     );
   }
 }
