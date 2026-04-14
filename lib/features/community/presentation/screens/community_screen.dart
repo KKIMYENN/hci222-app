@@ -20,7 +20,13 @@ class CommunityScreen extends StatelessWidget {
     _MockFeed('Grapes 1kg', 65.0, 55.0, 'Khan el-Khalili Market', '2 min ago'),
     _MockFeed('Tomatoes 1kg', 14.0, 10.0, 'Ataba Market', '15 min ago'),
     _MockFeed('Cucumbers 1kg', 6.0, 8.0, 'Imbaba Market', '32 min ago'),
-    _MockFeed('Pomegranate 1 pc', 45.0, 30.0, 'Khan el-Khalili Market', '1 hr ago'),
+    _MockFeed(
+      'Pomegranate 1 pc',
+      45.0,
+      30.0,
+      'Khan el-Khalili Market',
+      '1 hr ago',
+    ),
     _MockFeed('Lemons 5 pcs', 18.0, 20.0, 'Ataba Market', '2 hr ago'),
   ];
 
@@ -142,5 +148,11 @@ class _MockFeed {
   final double avgPrice;
   final String marketName;
   final String timeAgo;
-  _MockFeed(this.productName, this.price, this.avgPrice, this.marketName, this.timeAgo);
+  _MockFeed(
+    this.productName,
+    this.price,
+    this.avgPrice,
+    this.marketName,
+    this.timeAgo,
+  );
 }
